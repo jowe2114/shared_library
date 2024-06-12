@@ -1,18 +1,16 @@
-#!/usr/bin/env groovy
-
 def call(String githubToken, String imageName, String gitUserEmail, String gitUserName, String gitRepoName) {
-
-    withCredentials([string(credentialsId: "${githubToken}", variable: 'GITHUB_TOKEN')]) {
-                sh '''
-                    git config user.email "${gitUserEmail}"
-                    git config user.name "${gitUserName}"
-                    sed -i "s|image:.*|image: ${imageName}:${BUILD_NUMBER}|g" oc/deployment.yml
-                    git add oc/deployment.yml
-                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                    git push https://${GITHUB_TOKEN}@github.com/${gitUserName}/${gitRepoName} HEAD:dev
-                   '''
+    echo "Editing deployment.yaml with new image: ${imageName}"
     
-
-  }
+    // Your logic to update deployment.yaml
+    // For example, using a shell script to replace the image in the deployment.yaml file
+    sh """
+    sed -i 's|image:.*|image: ${imageName}|' path/to/deployment.yaml
+    git config user.email "${gitUserEmail}"
+    git config user.name "${gitUserName}"
+    git add path/to/deployment.yaml
+    git commit -m "Update image to ${imageName}"
+    git push https://${gitUserName}:${githubToken}@github.com/${gitUserName}/${gitRepoName}.git
+    """
 }
 
+return this
